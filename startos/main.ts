@@ -1,8 +1,8 @@
+import { adminTxtFile } from './fileHelpers/lndg-admin.txt'
 import { sdk } from './sdk'
-import { T } from '@start9labs/start-sdk'
 import { uiPort } from './utils'
 
-export const main = sdk.setupMain(async ({ effects, started }) => {
+export const main = sdk.setupMain(async ({ effects }) => {
   /**
    * ======================== Setup (optional) ========================
    *
@@ -10,15 +10,11 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
    */
   console.info('Starting LNDg!')
 
-  const depResult = await sdk.checkDependencies(effects)
-  depResult.throwIfNotSatisfied()
+  const adminPassword = await adminTxtFile.read().const(effects)
 
-  /**
-   * ======================== Additional Health Checks (optional) ========================
-   *
-   * In this section, we define *additional* health checks beyond those included with each daemon (below).
-   */
-  const healthReceipts: T.HealthCheck[] = []
+  if (!adminPassword) {
+    throw new Error('Admin password not set!')
+  }
 
   /**
    * ======================== Daemons ========================
@@ -27,7 +23,7 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
    *
    * Each daemon defines its own health check, which can optionally be exposed to the user.
    */
-  return sdk.Daemons.of(effects, started, healthReceipts).addDaemon('primary', {
+  return sdk.Daemons.of(effects).addDaemon('primary', {
     subcontainer: await sdk.SubContainer.of(
       effects,
       { imageId: 'lndg' },
@@ -48,29 +44,15 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
         .mountDependency({
           dependencyId: 'lnd',
           volumeId: 'main',
-          subpath: '/mnt/lnd/',
-          mountpoint: '/app/data/mnt/lnd/data/chain/bitcoin/mainnet',
+          subpath: null,
+          mountpoint: '/mnt/lnd',
           readonly: true,
         }),
       'lndg-sub',
     ),
     exec: {
-      command: [
-        'initialize.py',
-        '-net',
-        'mainnet',
-        '-rpc',
-        '127.0.0.1:10009',
-        '-wn',
-        '&&',
-        'python',
-        'controller.py',
-        'runserver',
-        '0.0.0.0:8889',
-        '>',
-        '/var/log/lndg-controller.log',
-        '1>&1',
-      ],
+      command: sdk.useEntrypoint(),
+      runAsInit: true,
     },
     ready: {
       display: 'Web Interface',

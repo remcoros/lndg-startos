@@ -4,8 +4,8 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
   return {
     lnd: {
       kind: 'running',
-      versionRange: '>=18.4',
-      healthChecks: ['primary'], // @TODO make sure this is the correct health check ID
+      versionRange: '>=0.19.3-beta:1-beta.0',
+      healthChecks: [],
     },
   }
 })
