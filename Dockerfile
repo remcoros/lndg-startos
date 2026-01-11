@@ -19,14 +19,15 @@ RUN git clone --depth 1 --branch "${LNDG_REF}" https://github.com/cryptosharks13
 
 # Build wheels for dependencies (faster + clean final image)
 RUN pip wheel --wheel-dir /wheels -r requirements.txt && \
-    pip wheel --wheel-dir /wheels supervisor whitenoise
+    pip wheel --wheel-dir /wheels supervisor whitenoise gunicorn
 
 FROM python:3-alpine
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PYTHONDONTWRITEBYTECODE=1
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONWARNINGS="ignore::SyntaxWarning"
 
 RUN apk add --no-cache \
       tini \
@@ -38,7 +39,7 @@ COPY --from=builder /app /app
 COPY --from=builder /wheels /wheels
 
 RUN pip install --no-index --find-links=/wheels -r requirements.txt && \
-    pip install --no-index --find-links=/wheels supervisor whitenoise && \
+    pip install --no-index --find-links=/wheels supervisor whitenoise gunicorn && \
     rm -rf /wheels
 
 COPY --chmod=755 ./entrypoint.sh /app/entrypoint.sh

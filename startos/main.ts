@@ -1,6 +1,6 @@
 import { adminTxtFile } from './fileHelpers/lndg-admin.txt'
 import { sdk } from './sdk'
-import { uiPort } from './utils'
+import { mainMounts, uiPort } from './utils'
 
 export const main = sdk.setupMain(async ({ effects }) => {
   /**
@@ -27,27 +27,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
     subcontainer: await sdk.SubContainer.of(
       effects,
       { imageId: 'lndg' },
-      sdk.Mounts.of()
-        .mountVolume({
-          volumeId: 'main',
-          subpath: null,
-          mountpoint: '/root',
-          readonly: false,
-        })
-        .mountVolume({
-          volumeId: 'data',
-          subpath: null,
-          mountpoint: '/app/data',
-          readonly: false,
-        })
-        // @TODO watch the macaroon and restart if changes
-        .mountDependency({
-          dependencyId: 'lnd',
-          volumeId: 'main',
-          subpath: null,
-          mountpoint: '/mnt/lnd',
-          readonly: true,
-        }),
+      mainMounts,
       'lndg-sub',
     ),
     exec: {
