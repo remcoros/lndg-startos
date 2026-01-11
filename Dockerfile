@@ -19,7 +19,7 @@ RUN git clone --depth 1 --branch "${LNDG_REF}" https://github.com/cryptosharks13
 
 # Build wheels for dependencies (faster + clean final image)
 RUN pip wheel --wheel-dir /wheels -r requirements.txt && \
-    pip wheel --wheel-dir /wheels supervisor whitenoise gunicorn
+    pip wheel --wheel-dir /wheels supervisor whitenoise
 
 FROM python:3-alpine
 
@@ -38,7 +38,7 @@ COPY --from=builder /app /app
 COPY --from=builder /wheels /wheels
 
 RUN pip install --no-index --find-links=/wheels -r requirements.txt && \
-    pip install --no-index --find-links=/wheels supervisor whitenoise gunicorn && \
+    pip install --no-index --find-links=/wheels supervisor whitenoise && \
     rm -rf /wheels
 
 COPY --chmod=755 ./entrypoint.sh /app/entrypoint.sh

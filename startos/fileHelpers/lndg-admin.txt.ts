@@ -3,8 +3,8 @@ import { sdk } from '../sdk'
 
 export const adminTxtFile = FileHelper.raw(
   {    
-    // base: sdk.volumes.main,
-    volumeId: 'main',
+    // base: sdk.volumes.data,
+    volumeId: 'data',
     subpath: '/lndg-admin.txt',
   },
   (a) => a,
