@@ -1,6 +1,7 @@
 import { adminTxtFile } from './fileHelpers/lndg-admin.txt'
 import { sdk } from './sdk'
 import { mainMounts, uiPort } from './utils'
+import { i18n } from './i18n'
 
 export const main = sdk.setupMain(async ({ effects }) => {
   /**
@@ -13,7 +14,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
   const adminPassword = await adminTxtFile.read().const(effects)
 
   if (!adminPassword) {
-    throw new Error('Admin password not set!')
+    throw new Error(i18n('Admin password not set!'))
   }
 
   /**
@@ -35,11 +36,11 @@ export const main = sdk.setupMain(async ({ effects }) => {
       runAsInit: true,
     },
     ready: {
-      display: 'Web Interface',
+      display: i18n('Web Interface'),
       fn: () =>
         sdk.healthCheck.checkPortListening(effects, uiPort, {
-          successMessage: 'The web interface is ready',
-          errorMessage: 'The web interface is not ready',
+          successMessage: i18n('The web interface is ready'),
+          errorMessage: i18n('The web interface is not ready'),
         }),
     },
     requires: [],

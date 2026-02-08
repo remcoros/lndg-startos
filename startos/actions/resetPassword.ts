@@ -10,11 +10,10 @@ export const resetPassword = sdk.Action.withoutInput(
   // metadata
   async ({ effects }) => {
     const hasPass = await adminTxtFile.read().const(effects)
-    const desc = 'your LNDg password'
 
     return {
       name: hasPass ? 'Reset Password' : 'Create Password',
-      description: hasPass ? `Reset ${desc}` : `Create ${desc}`,
+      description: hasPass ? 'Reset your LNDg password' : 'Create your LNDg password',
       warning: null,
       allowedStatuses: 'any',
       group: null,

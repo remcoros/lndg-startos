@@ -5,8 +5,7 @@ import { sdk } from '../sdk'
 // it does not actually store any password
 export const adminTxtFile = FileHelper.raw(
   {    
-    // base: sdk.volumes.data,
-    volumeId: 'data',
+    base: sdk.volumes.data,
     subpath: '/lndg-admin.txt',
   },
   (a) => a,
